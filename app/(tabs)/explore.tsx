@@ -10,8 +10,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types/navigation';
 
 export default function ExploreScreen() {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [languages, setLanguages] = useState<{ id: number; full_name: string }[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>([]); //create a function to fetch exercises from exercise.ts
+  const [languages, setLanguages] = useState<{ id: number; full_name: string }[]>([]); //
   const [selectedLanguage, setSelectedLanguage] = useState(2); // Default english language
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +32,7 @@ export default function ExploreScreen() {
   }, []);
 
   useEffect(() => {
-    const fetchExercises = async () => {
+    const fetchExercises = async () => { //22-39 make individual functions, the whole block can be functions and then called in useEffect
       setLoading(true);
       try {
         const exercises = await getExercises({ language: selectedLanguage });
