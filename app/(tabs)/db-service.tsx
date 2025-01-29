@@ -107,15 +107,14 @@ const updateUser = async () => {
 }
 
 const deleteUser = async () => {
-    console.log('insertUser:');
+    console.log('Deleting user from database...');
     
         try{
 
             const db = await SQLite.openDatabaseAsync('flexzone_database');
 
             // `runAsync()` is useful when you want to execute some write operations.
-            const result = await db.runAsync('INSERT INTO users (id, username, password, api_token) VALUES (?, ?, ?, ?)', 2, 'alberto2', 'albertopassword2', 'abc2');
-            console.log(result.lastInsertRowId, result.changes);
+            await db.runAsync('DELETE FROM users WHERE id = $id', { $id: 2 }); // Binding named parameters from object
 
         }catch (e){
             console.error("error: ", e);
