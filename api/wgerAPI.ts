@@ -21,3 +21,23 @@ export const getExercises = async (params = {}) => {
         throw error;
     }
 };
+
+export const getExerciseDetail = async (id: number) => {
+    try {
+        const response = await api.get(`/exercisebaseinfo/${id}/`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching exercise detail');
+        throw error;
+    }
+};
+
+export const getLanguages = async () => {
+    try {
+      const response = await api.get('/language/');
+      return response.data.results; 
+    } catch (error) {
+      console.error('Error fetching languages');
+      throw error;
+    }
+  };
