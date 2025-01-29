@@ -133,4 +133,29 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 14,
   },
+
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+
+  exerciseItem: {
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+  },
+
+  categoryName: {
+    fontSize: 18,
+    color: 'black',
+  },
+
+  subExerciseName: {
+    fontSize:16,
+    color:'black',
+    marginLeft: 10,
+  },
+
 });
