@@ -9,7 +9,7 @@ import { Exercise } from '@/types/exercise';
 
 
 const initDB = async () => {
-    console.log('initDB');
+    console.log('Initializing database...');
     
         try{
 
@@ -48,14 +48,14 @@ const initDB = async () => {
 }
 
 const insertUser = async () => {
-    console.log('insertUser:');
+    console.log('Inserting user into database...');
     
         try{
 
             const db = await SQLite.openDatabaseAsync('flexzone_database');
 
             // `runAsync()` is useful when you want to execute some write operations.
-            const result = await db.runAsync('INSERT INTO users (id, username, password, api_token) VALUES (?, ?, ?, ?)', 1, 'alberto', 'albertopassword', 'abc');
+            const result = await db.runAsync('INSERT INTO users (id, username, password, api_token) VALUES (?, ?, ?, ?)', 2, 'alberto2', 'albertopassword2', 'abc2');
             console.log(result.lastInsertRowId, result.changes);
 
         }catch (e){
@@ -64,18 +64,58 @@ const insertUser = async () => {
 
 }
 
+type User = {
+    id: number;
+    username: string;
+    password: string;
+    api_token: string | null; // Nullable since it might be NULL in the database
+};
+
 const selectUser = async () => {
-    console.log('selectUser:');
+    console.log("Fetching users from database...");
+
+    try {
+        const db = await SQLite.openDatabaseAsync("flexzone_database");
+
+        // Explicitly cast the result to an array of User[]
+        const allRows = (await db.getAllAsync("SELECT * FROM users")) as User[];
+
+        // Iterate over typed rows
+        for (const row of allRows) {
+            console.log(`ID: ${row.id}, Username: ${row.username}, Password: ${row.password}, API Token: ${row.api_token}`);
+        }
+
+    } catch (e) {
+        console.error("Database error:", e);
+    }
+};
+
+const updateUser = async () => {
+    console.log('Updating user from database...');
     
         try{
 
             const db = await SQLite.openDatabaseAsync('flexzone_database');
 
-            // `getAllAsync()` is useful when you want to get all results as an array of objects.
-            const allRows = await db.getAllAsync('SELECT * FROM users');
-            for (const row of allRows) {
-                
-            }
+            // `runAsync()` is useful when you want to execute some write operations.
+            await db.runAsync('UPDATE users SET username = ? WHERE id = ?', ['foo', 2]); // Binding unnamed parameters from array
+
+        }catch (e){
+            console.error("error: ", e);
+        }
+
+}
+
+const deleteUser = async () => {
+    console.log('insertUser:');
+    
+        try{
+
+            const db = await SQLite.openDatabaseAsync('flexzone_database');
+
+            // `runAsync()` is useful when you want to execute some write operations.
+            const result = await db.runAsync('INSERT INTO users (id, username, password, api_token) VALUES (?, ?, ?, ?)', 2, 'alberto2', 'albertopassword2', 'abc2');
+            console.log(result.lastInsertRowId, result.changes);
 
         }catch (e){
             console.error("error: ", e);
@@ -99,6 +139,27 @@ export default function TabThreeScreen() {
                 <Button
                 title="Insert User"
                 onPress={() => insertUser()}
+                />
+            </View>
+            <View
+                style={styles.btn}>
+                <Button
+                title="Select Users"
+                onPress={() => selectUser()}
+                />
+            </View>
+            <View
+                style={styles.btn}>
+                <Button
+                title="Update User"
+                onPress={() => updateUser()}
+                />
+            </View>
+            <View
+                style={styles.btn}>
+                <Button
+                title="Delete Users"
+                onPress={() => deleteUser()}
                 />
             </View>
         </View>
