@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Image, Platform, View, Text, FlatList } from 'react-native';
-import { getExercises, Exercise } from '../api/wgerAPI';
-
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { getExercises} from '../../api/wgerAPI';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Exercise } from '@/.expo/types/exercise';
 
 export default function TabTwoScreen() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -17,19 +13,6 @@ export default function TabTwoScreen() {
     const fetchExercises = async () => {
       try {
         const exercises = await getExercises();
-        exercises.forEach((exercise: any) => {
-            console.log("Exercise ID:", exercise.id);
-            console.log("Category Name:", exercise.category.name);
-
-            if (exercise.exercises && exercise.exercises.length > 0) {
-                exercise.exercises.forEach((subExercise: any) => {
-                    console.log("Sub-Exercise Name:", subExercise.name);
-                });
-            } else {
-                console.log("No sub-exercises found for this exercise.");
-            }
-        });
-
         setExercises(exercises);
       } catch (error) {
         console.log(error);
@@ -43,14 +26,14 @@ export default function TabTwoScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Loading exercises...</Text>
-      </View>
+      <ThemedView style={styles.container}>
+        <ThemedText>Loading exercises...</ThemedText>
+      </ThemedView>
     );
   }
 
   return (
-    <View>
+    <ThemedView>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Exercises</ThemedText>
       </ThemedView>
@@ -59,22 +42,22 @@ export default function TabTwoScreen() {
         data={exercises}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.exerciseItem}>
-            <Text style={styles.categoryName}>Category: {item.category.name}</Text>
+          <ThemedView style={styles.exerciseItem}>
+            <ThemedText style={styles.categoryName}>Category: {item.category.name}</ThemedText>
           {item.exercises && item.exercises.length > 0 ? (
             <FlatList
             data = {item.exercises}
             keyExtractor={(subItem) => subItem.id.toString()}
             renderItem={({item: subExercise}) => ( 
-              <Text style={styles.subExerciseName}>- {subExercise.name}</Text>
+              <ThemedText style={styles.subExerciseName}>- {subExercise.name}</ThemedText>
             )}
             />):(
-              <Text style={styles.subExerciseName}>No exercises avaiable</Text>
+              <ThemedText style={styles.subExerciseName}>No exercises avaiable</ThemedText>
             )}
-          </View>
+          </ThemedView>
         )}
         />
-    </View>
+    </ThemedView>
   );
 }
 

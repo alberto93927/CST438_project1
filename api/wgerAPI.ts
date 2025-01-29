@@ -1,4 +1,5 @@
 import axios from 'axios';
+//import {exercise} from 'exercise';
 
 const BASE_URL = 'https://wger.de/api/v2';
 const api = axios.create({
@@ -9,21 +10,7 @@ const api = axios.create({
     }
 });
 
-export interface Exercise {
-    id: number;
-    name: string;
-    description: string;
-    category: {
-        id: number;
-        name: string;
-    };
-    exercises: {
-        id: number;
-        name: string;
-        description: string;
-        [key: string]: any;
-    }[];
-}
+
 
 export const getExercises = async (params = {}) => {
     try {
