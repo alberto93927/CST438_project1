@@ -1,11 +1,6 @@
 import * as SQLite from 'expo-sqlite';
+import { StyleSheet, Platform, View, Text, Button } from 'react-native';
 
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Image, Platform, View, Text, FlatList, Button, Alert } from 'react-native';
-import { getExercises} from '../../api/wgerAPI';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Exercise } from '@/types/exercise';
 
 
 const initDB = async () => {
