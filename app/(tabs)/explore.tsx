@@ -3,7 +3,7 @@ import { StyleSheet, Image, Platform, View, Text, FlatList } from 'react-native'
 import { getExercises} from '../../api/wgerAPI';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Exercise } from '@/.expo/types/exercise';
+import { Exercise } from '@/types/exercise';
 
 export default function TabTwoScreen() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
