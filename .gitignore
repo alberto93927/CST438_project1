@@ -17,6 +17,9 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# build
+android
+
 # Metro
 .metro-health-check*
 
@@ -35,4 +38,4 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-app-example
+.vscode
