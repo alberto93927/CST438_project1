@@ -1,89 +1,104 @@
 import * as SQLite from 'expo-sqlite';
 import { StyleSheet, Platform, View, Text, Button } from 'react-native';
 
-
-
 const initDB = async () => {
-    console.log('Initializing database...');
-    
-        try{
-
-            const db = await SQLite.openDatabaseAsync('flexzone_database');
-
-            await db.execAsync(`
-            
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT NOT NULL UNIQUE,
-                    password TEXT NOT NULL,
-                    api_token TEXT
-                );
-
-                CREATE TABLE IF NOT EXISTS exercises (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    description TEXT,
-                    muscle_group TEXT,
-                    api_id TEXT UNIQUE
-                );
-
-                CREATE TABLE IF NOT EXISTS workout_plans (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER,
-                    name TEXT NOT NULL,
-                    FOREIGN KEY(user_id) REFERENCES users(id)
-                );
-
-                `);
-
-        }catch (e){
-            console.error("error: ", e);
-        }
-
-}
-
-const insertUser = async () => {
-    console.log('Inserting user into database...');
-    
-        try{
-
-            const db = await SQLite.openDatabaseAsync('flexzone_database');
-
-            // `runAsync()` is useful when you want to execute some write operations.
-            const result = await db.runAsync('INSERT INTO users (id, username, password, api_token) VALUES (?, ?, ?, ?)', 2, 'alberto2', 'albertopassword2', 'abc2');
-            console.log(result.lastInsertRowId, result.changes);
-
-        }catch (e){
-            console.error("error: ", e);
-        }
-
-}
-
-type User = {
-    id: number;
-    username: string;
-    password: string;
-    api_token: string | null; // Nullable since it might be NULL in the database
-};
-
-const selectUser = async () => {
-    console.log("Fetching users from database...");
+    console.log("Reinitializing database...");
 
     try {
         const db = await SQLite.openDatabaseAsync("flexzone_database");
 
-        // Explicitly cast the result to an array of User[]
-        const allRows = (await db.getAllAsync("SELECT * FROM users")) as User[];
+        // Drop old tables if they exist
+        await db.execAsync(`
+            DROP TABLE IF EXISTS users;
+            DROP TABLE IF EXISTS exercises;
+            DROP TABLE IF EXISTS workout_plans;
+        `);
 
-        // Iterate over typed rows
-        for (const row of allRows) {
-            console.log(`ID: ${row.id}, Username: ${row.username}, Password: ${row.password}, API Token: ${row.api_token}`);
-        }
+        // Create new tables with updated schema
+        await db.execAsync(`
+            CREATE TABLE users (
+                id TEXT PRIMARY KEY,  -- Now using TEXT for Google UID
+                username TEXT UNIQUE,
+                email TEXT UNIQUE,
+                profile_pic TEXT
+            );
+
+            CREATE TABLE exercises (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                muscle_group TEXT,
+                api_id TEXT UNIQUE
+            );
+
+            CREATE TABLE workout_plans (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT,  -- Updated to match Google UID
+                name TEXT NOT NULL,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            );
+        `);
+
+        console.log("Database reset and reinitialized successfully!");
 
     } catch (e) {
-        console.error("Database error:", e);
+        console.error("Error resetting database: ", e);
     }
 };
+
+
+export const insertUser = async (
+    id: string,
+    username: string,
+    email: string,
+    profilePic: string
+) => {
+    console.log("Inserting user into database...");
+
+    try {
+        const db = await SQLite.openDatabaseAsync("flexzone_database");
+
+        await db.runAsync(
+            `INSERT OR REPLACE INTO users (id, username, email, profile_pic) VALUES (?, ?, ?, ?);`,
+            [id, username, email, profilePic]
+        );
+
+    } catch (e) {
+        console.error("error: ", e);
+    }
+};
+
+
+
+type User = {
+    id: string;
+    username: string;
+    email: string;
+};
+
+
+export const selectUser = async (id: string, callback: (user: any) => void) => {
+    console.log("Fetching user from database...");
+
+    try {
+        const db = await SQLite.openDatabaseAsync("flexzone_database");
+
+        const user = (await db.getFirstAsync("SELECT * FROM users WHERE id = ?", [id])) as User;
+
+        if (user) {
+            console.log(`ID: ${user.id}, Name: ${user.username}, Email: ${user.email}`);
+            callback(user);
+        } else {
+            console.log("User not found in database.");
+            callback(null);
+        }
+    } catch (e) {
+        console.error("Database error:", e);
+        callback(null);
+    }
+};
+
+
 
 const updateUser = async () => {
     console.log('Updating user from database...');
@@ -128,7 +143,7 @@ export default function TabThreeScreen() {
                 onPress={() => initDB()}
                 />
             </View>
-            <View
+            {/* <View
                 style={styles.btn}>
                 <Button
                 title="Insert User"
@@ -141,7 +156,7 @@ export default function TabThreeScreen() {
                 title="Select Users"
                 onPress={() => selectUser()}
                 />
-            </View>
+            </View> */}
             <View
                 style={styles.btn}>
                 <Button
@@ -175,3 +190,4 @@ const styles = StyleSheet.create({
     }
 
 });
+

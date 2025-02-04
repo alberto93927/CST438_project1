@@ -1,6 +1,8 @@
 import { useContext, createContext, type PropsWithChildren, useEffect, useState, useCallback } from 'react';
 import { useStorageState } from './useStorageState';
 import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from '@react-native-google-signin/google-signin';
+import { insertUser } from "../app/(tabs)/db-service"; 
+
 
 const AuthContext = createContext<{
   signIn: () => void;
@@ -37,33 +39,26 @@ export function SessionProvider({ children }: PropsWithChildren) {
       value={{
         signIn: async () => {
           try {
-            await GoogleSignin.hasPlayServices();
-            const response = await GoogleSignin.signIn();
+              await GoogleSignin.hasPlayServices();
+              const response = await GoogleSignin.signIn();
 
-            if (isSuccessResponse(response)) {
-              setSession(JSON.stringify(response.data.user));
-            } else {
-              console.error('Sign in was cancelled');
-            }
-          } catch (error) {
-            console.error(error);
-            if (isErrorWithCode(error)) {
-              switch (error.code) {
-                case statusCodes.IN_PROGRESS:
-                  console.error("Sign-in already in progress");
-                  break;
-                case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-                  console.error(
-                    "Play services are not available. Please install Play services from the Play Store."
-                  );
-                  break;
-                default:
-                  console.error("An error occurred while signing in");
-                  break;
+              if (isSuccessResponse(response)) {
+                  const user = response.data.user;
+                  setSession(JSON.stringify(user));
+
+                  insertUser(
+                    user.id || "",  // Ensure a fallback empty string if null
+                    user.name || "Unknown", // Provide a default value
+                    user.email || "No email",
+                    user.photo || "" // Ensure a fallback for null photos
+                );
+                
+
+              } else {
+                  console.error("Sign in was cancelled");
               }
-            } else {
-              console.error("An error occurred while signing in");
-            }
+          } catch (error) {
+              console.error("Error signing in:", error);
           }
         },
         signOut: async () => {
