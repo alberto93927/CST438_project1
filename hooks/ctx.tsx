@@ -37,35 +37,20 @@ export function SessionProvider({ children }: PropsWithChildren) {
       value={{
         signIn: async () => {
           try {
-            await GoogleSignin.hasPlayServices();
-            const response = await GoogleSignin.signIn();
-
-            if (isSuccessResponse(response)) {
-              setSession(JSON.stringify(response.data.user));
-            } else {
-              console.error('Sign in was cancelled');
-            }
-          } catch (error) {
-            console.error(error);
-            if (isErrorWithCode(error)) {
-              switch (error.code) {
-                case statusCodes.IN_PROGRESS:
-                  console.error("Sign-in already in progress");
-                  break;
-                case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-                  console.error(
-                    "Play services are not available. Please install Play services from the Play Store."
-                  );
-                  break;
-                default:
-                  console.error("An error occurred while signing in");
-                  break;
+              await GoogleSignin.hasPlayServices();
+              const response = await GoogleSignin.signIn();
+              if (isSuccessResponse(response)) {
+                  const userSession = JSON.stringify(response.data.user);
+                  setSession(userSession);
+                  return userSession; // Return user session
               }
-            } else {
-              console.error("An error occurred while signing in");
-            }
+          } catch (error) {
+              console.error("Sign-in failed:", error);
           }
-        },
+          return null; // If login fails, return null
+      },
+      
+      
         signOut: async () => {
           try {
             await GoogleSignin.revokeAccess();
