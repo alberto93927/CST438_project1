@@ -2,7 +2,7 @@ import * as SQLite from 'expo-sqlite';
 import { StyleSheet, Platform, View, Text, Button } from 'react-native';
 
 export const initDB = async () => {
-    console.log("Reinitializing database...");
+    console.log("Initializing database...");
 
     try {
         const db = await SQLite.openDatabaseAsync("flexzone_database");
@@ -18,51 +18,46 @@ export const initDB = async () => {
         //     DROP TABLE IF EXISTS workout_exercises;
         // `);
 
-        // When you start fresh, you have to initialize the database
-        // Uncomment the following lines in startup
-        // Once the database is initialized, you can comment it out to check for persistance
-        // I will create better logic for this
-        // There has to 
+        // Ensure tables exist, but do NOT drop them every time
+        await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                username TEXT UNIQUE,
+                email TEXT UNIQUE,
+                profile_pic TEXT
+            );
 
-        // Create new tables
-        // await db.execAsync(`
-        //     CREATE TABLE users (
-        //         id TEXT PRIMARY KEY,
-        //         username TEXT UNIQUE,
-        //         email TEXT UNIQUE,
-        //         profile_pic TEXT
-        //     );
+            CREATE TABLE IF NOT EXISTS exercises (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                muscle_group TEXT,
+                api_id TEXT UNIQUE
+            );
 
-        //     CREATE TABLE exercises (
-        //         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //         name TEXT NOT NULL,
-        //         description TEXT,
-        //         muscle_group TEXT,
-        //         api_id TEXT UNIQUE
-        //     );
+            CREATE TABLE IF NOT EXISTS workout_plans (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT,
+                name TEXT NOT NULL,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            );
 
-        //     CREATE TABLE workout_plans (
-        //         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //         user_id TEXT,
-        //         name TEXT NOT NULL,
-        //         FOREIGN KEY(user_id) REFERENCES users(id)
-        //     );
+            CREATE TABLE IF NOT EXISTS workout_exercises (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                workout_id INTEGER,
+                exercise_id INTEGER,
+                FOREIGN KEY(workout_id) REFERENCES workout_plans(id) ON DELETE CASCADE,
+                FOREIGN KEY(exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
+            );
+        `);
 
-        //     CREATE TABLE workout_exercises (
-        //         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //         workout_id INTEGER,
-        //         exercise_id INTEGER,
-        //         FOREIGN KEY(workout_id) REFERENCES workout_plans(id) ON DELETE CASCADE,
-        //         FOREIGN KEY(exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
-        //     );
-        // `);
-
-        console.log("Database reset and reinitialized successfully!");
+        console.log("Database initialized successfully!");
 
     } catch (e) {
-        console.error("Error resetting database: ", e);
+        console.error("Error initializing database: ", e);
     }
 };
+
 
 //user table functions
 
