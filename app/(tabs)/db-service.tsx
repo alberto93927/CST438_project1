@@ -132,6 +132,42 @@ const deleteUser = async () => {
 
 }
 
+export const insertWorkoutPlan = async (user_id: string, name: string) => {
+    try {
+        const db = await SQLite.openDatabaseAsync("flexzone_database");
+        await db.runAsync(
+            `INSERT INTO workout_plans (user_id, name) VALUES (?, ?);`,
+            [user_id, name]
+        );
+    } catch (e) {
+        console.error("Error inserting workout plan:", e);
+    }
+};
+
+export const fetchWorkoutPlans = async (user_id: string, callback: (plans: any[]) => void) => {
+    try {
+        const db = await SQLite.openDatabaseAsync("flexzone_database");
+        const plans = await db.getAllAsync(
+            "SELECT * FROM workout_plans WHERE user_id = ?",
+            [user_id]
+        );
+        callback(plans);
+    } catch (e) {
+        console.error("Error fetching workout plans:", e);
+        callback([]);
+    }
+};
+
+export const deleteWorkoutPlan = async (id: number) => {
+    try {
+        const db = await SQLite.openDatabaseAsync("flexzone_database");
+        await db.runAsync("DELETE FROM workout_plans WHERE id = ?", [id]);
+    } catch (e) {
+        console.error("Error deleting workout plan:", e);
+    }
+};
+
+
 export default function TabThreeScreen() {
     return(
         <View style={styles.container}>
