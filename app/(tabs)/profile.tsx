@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Image, FlatList, Text, TextInput, View } from "react-native";
+import { Button, StyleSheet, Image, FlatList, Text, TextInput, View, TouchableOpacity } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useSession } from "@/hooks/ctx";
-import { selectUser, fetchWorkoutPlans, insertWorkoutPlan, deleteWorkoutPlan } from "./db-service";
+import { selectUser, fetchWorkoutPlans, insertWorkoutPlan, deleteWorkoutPlan, fetchExercisesForWorkout, insertExerciseAndLinkToWorkout } from "./db-service";
 
 export default function ProfileScreen() {
     const { session, signOut } = useSession();
     const [storedUser, setStoredUser] = useState<any | null>(null);
     const [workoutPlans, setWorkoutPlans] = useState<any[]>([]);
+    const [selectedWorkout, setSelectedWorkout] = useState<number | null>(null);
+    const [exercises, setExercises] = useState<any[]>([]);
     const [newWorkoutPlan, setNewWorkoutPlan] = useState("");
+    const [newExercise, setNewExercise] = useState("");
 
     useEffect(() => {
         if (session) {
@@ -39,6 +42,28 @@ export default function ProfileScreen() {
         fetchWorkoutPlans(storedUser.id, setWorkoutPlans);
     };
 
+    const handleSelectWorkout = async (id: number) => {
+        setSelectedWorkout(id);
+        fetchExercisesForWorkout(id, setExercises);
+    };
+
+    const handleAddExercise = async () => {
+        if (!newExercise.trim() || selectedWorkout === null) return;
+    
+        try {
+            // Insert new exercise and link it to the selected workout
+            await insertExerciseAndLinkToWorkout(selectedWorkout, newExercise);
+    
+            // Refresh exercises list
+            fetchExercisesForWorkout(selectedWorkout, setExercises);
+            setNewExercise(""); // Clear input
+        } catch (error) {
+            console.error("Error adding exercise:", error);
+        }
+    };
+    
+    
+
     return (
         <ThemedView style={styles.container}>
             {storedUser?.profile_pic && (
@@ -63,12 +88,31 @@ export default function ProfileScreen() {
                 data={workoutPlans}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <View style={styles.workoutPlan}>
+                    <TouchableOpacity onPress={() => handleSelectWorkout(item.id)} style={styles.workoutPlan}>
                         <Text style={styles.workoutName}>{item.name}</Text>
                         <Button title="❌" onPress={() => handleDeleteWorkoutPlan(item.id)} />
-                    </View>
+                    </TouchableOpacity>
                 )}
             />
+
+            {/* Add Exercises to Selected Workout */}
+            {selectedWorkout && (
+                <View style={styles.exerciseContainer}>
+                    <Text style={styles.sectionTitle}>Exercises for Selected Workout</Text>
+                    <FlatList
+                        data={exercises}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => <Text style={styles.exerciseText}>{item.name}</Text>}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="New Exercise"
+                        value={newExercise}
+                        onChangeText={setNewExercise}
+                    />
+                    <Button title="Add Exercise" onPress={handleAddExercise} />
+                </View>
+            )}
 
             <Button title="Sign Out" onPress={signOut} />
         </ThemedView>
@@ -114,5 +158,23 @@ const styles = StyleSheet.create({
     },
     workoutName: {
         fontSize: 16,
+    },
+    exerciseContainer: {
+        marginTop: 20,
+        width: "100%",
+        padding: 10,
+        borderRadius: 5,
+        backgroundColor: "#eef",
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 10,
+        textAlign: "center",
+    },
+    exerciseText: {
+        fontSize: 16,
+        paddingVertical: 5,
+        textAlign: "center",
     },
 });

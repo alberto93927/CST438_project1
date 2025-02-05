@@ -55,7 +55,7 @@ const initDB = async () => {
     }
 };
 
-
+//user table functions
 
 export const insertUser = async (
     id: string,
@@ -142,6 +142,7 @@ const deleteUser = async () => {
 
 }
 
+//workout_plans table functions
 export const insertWorkoutPlan = async (user_id: string, name: string) => {
     try {
         const db = await SQLite.openDatabaseAsync("flexzone_database");
@@ -174,6 +175,58 @@ export const deleteWorkoutPlan = async (id: number) => {
         await db.runAsync("DELETE FROM workout_plans WHERE id = ?", [id]);
     } catch (e) {
         console.error("Error deleting workout plan:", e);
+    }
+};
+
+
+export const insertExerciseAndLinkToWorkout = async (workout_id: number, exercise_name: string) => {
+    try {
+        const db = await SQLite.openDatabaseAsync("flexzone_database");
+
+        // Insert the exercise into the database
+        await db.runAsync(
+            `INSERT INTO exercises (name, description, muscle_group) VALUES (?, ?, ?);`,
+            [exercise_name, "Custom exercise", "General"]
+        );
+
+        // Get the last inserted exercise ID (Ensure it returns a valid object)
+        const result = await db.getFirstAsync<{ id: number }>("SELECT last_insert_rowid() as id;");
+        
+        if (!result || !result.id) {
+            console.error("Error: Exercise ID not retrieved properly");
+            return;
+        }
+
+        const exercise_id = result.id; // Now TypeScript knows `id` exists
+
+        // Insert into the workout_exercises table
+        await db.runAsync(
+            `INSERT INTO workout_exercises (workout_id, exercise_id) VALUES (?, ?);`,
+            [workout_id, exercise_id]
+        );
+
+        console.log(`Exercise '${exercise_name}' added with ID ${exercise_id} to workout ${workout_id}`);
+    } catch (e) {
+        console.error("Error inserting exercise into workout:", e);
+    }
+};
+
+
+
+export const fetchExercisesForWorkout = async (workout_id: number, callback: (exercises: any[]) => void) => {
+    try {
+        const db = await SQLite.openDatabaseAsync("flexzone_database");
+        const exercises = await db.getAllAsync(
+            `SELECT e.id, e.name, e.description, e.muscle_group 
+            FROM exercises e
+            JOIN workout_exercises we ON e.id = we.exercise_id
+            WHERE we.workout_id = ?`,
+            [workout_id]
+        );
+        callback(exercises);
+    } catch (e) {
+        console.error("Error fetching exercises for workout:", e);
+        callback([]);
     }
 };
 
