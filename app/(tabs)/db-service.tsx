@@ -12,12 +12,13 @@ const initDB = async () => {
             DROP TABLE IF EXISTS users;
             DROP TABLE IF EXISTS exercises;
             DROP TABLE IF EXISTS workout_plans;
+            DROP TABLE IF EXISTS workout_exercises;
         `);
 
-        // Create new tables with updated schema
+        // Create new tables
         await db.execAsync(`
             CREATE TABLE users (
-                id TEXT PRIMARY KEY,  -- Now using TEXT for Google UID
+                id TEXT PRIMARY KEY,
                 username TEXT UNIQUE,
                 email TEXT UNIQUE,
                 profile_pic TEXT
@@ -33,9 +34,17 @@ const initDB = async () => {
 
             CREATE TABLE workout_plans (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id TEXT,  -- Updated to match Google UID
+                user_id TEXT,
                 name TEXT NOT NULL,
                 FOREIGN KEY(user_id) REFERENCES users(id)
+            );
+
+            CREATE TABLE workout_exercises (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                workout_id INTEGER,
+                exercise_id INTEGER,
+                FOREIGN KEY(workout_id) REFERENCES workout_plans(id) ON DELETE CASCADE,
+                FOREIGN KEY(exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
             );
         `);
 
@@ -45,6 +54,7 @@ const initDB = async () => {
         console.error("Error resetting database: ", e);
     }
 };
+
 
 
 export const insertUser = async (
