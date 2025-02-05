@@ -105,7 +105,7 @@ export default function ProfileScreen() {
                         renderItem={({ item }) => <Text style={styles.exerciseText}>{item.name}</Text>}
                     />
                     <TextInput
-                        style={styles.input}
+                        style={styles.exerciseInput}
                         placeholder="New Exercise"
                         value={newExercise}
                         onChangeText={setNewExercise}
@@ -113,6 +113,7 @@ export default function ProfileScreen() {
                     <Button title="Add Exercise" onPress={handleAddExercise} />
                 </View>
             )}
+
 
             <Button title="Sign Out" onPress={signOut} />
         </ThemedView>
@@ -142,9 +143,21 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 1,
         borderColor: "#ccc",
-        padding: 8,
-        borderRadius: 5,
+        padding: 12,
+        borderRadius: 8,
         marginRight: 8,
+        fontSize: 16,
+    },
+    exerciseInput: {
+        borderWidth: 1,
+        borderColor: "#ccc",
+        padding: 12,
+        borderRadius: 8,
+        marginTop: 10,
+        fontSize: 16,
+        width: "100%",
+        backgroundColor: "#f9f9f9",
+        textAlign: "center",
     },
     workoutPlan: {
         flexDirection: "row",

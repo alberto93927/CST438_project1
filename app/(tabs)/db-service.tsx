@@ -1,52 +1,61 @@
 import * as SQLite from 'expo-sqlite';
 import { StyleSheet, Platform, View, Text, Button } from 'react-native';
 
-const initDB = async () => {
+export const initDB = async () => {
     console.log("Reinitializing database...");
 
     try {
         const db = await SQLite.openDatabaseAsync("flexzone_database");
 
         // Drop old tables if they exist
-        await db.execAsync(`
-            DROP TABLE IF EXISTS users;
-            DROP TABLE IF EXISTS exercises;
-            DROP TABLE IF EXISTS workout_plans;
-            DROP TABLE IF EXISTS workout_exercises;
-        `);
+        // Uncomment and use when updating the Schema of the database
+        // All the records will be lost
+
+        // await db.execAsync(`
+        //     DROP TABLE IF EXISTS users;
+        //     DROP TABLE IF EXISTS exercises;
+        //     DROP TABLE IF EXISTS workout_plans;
+        //     DROP TABLE IF EXISTS workout_exercises;
+        // `);
+
+        // When you start fresh, you have to initialize the database
+        // Uncomment the following lines in startup
+        // Once the database is initialized, you can comment it out to check for persistance
+        // I will create better logic for this
+        // There has to 
 
         // Create new tables
-        await db.execAsync(`
-            CREATE TABLE users (
-                id TEXT PRIMARY KEY,
-                username TEXT UNIQUE,
-                email TEXT UNIQUE,
-                profile_pic TEXT
-            );
+        // await db.execAsync(`
+        //     CREATE TABLE users (
+        //         id TEXT PRIMARY KEY,
+        //         username TEXT UNIQUE,
+        //         email TEXT UNIQUE,
+        //         profile_pic TEXT
+        //     );
 
-            CREATE TABLE exercises (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                description TEXT,
-                muscle_group TEXT,
-                api_id TEXT UNIQUE
-            );
+        //     CREATE TABLE exercises (
+        //         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        //         name TEXT NOT NULL,
+        //         description TEXT,
+        //         muscle_group TEXT,
+        //         api_id TEXT UNIQUE
+        //     );
 
-            CREATE TABLE workout_plans (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id TEXT,
-                name TEXT NOT NULL,
-                FOREIGN KEY(user_id) REFERENCES users(id)
-            );
+        //     CREATE TABLE workout_plans (
+        //         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        //         user_id TEXT,
+        //         name TEXT NOT NULL,
+        //         FOREIGN KEY(user_id) REFERENCES users(id)
+        //     );
 
-            CREATE TABLE workout_exercises (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                workout_id INTEGER,
-                exercise_id INTEGER,
-                FOREIGN KEY(workout_id) REFERENCES workout_plans(id) ON DELETE CASCADE,
-                FOREIGN KEY(exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
-            );
-        `);
+        //     CREATE TABLE workout_exercises (
+        //         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        //         workout_id INTEGER,
+        //         exercise_id INTEGER,
+        //         FOREIGN KEY(workout_id) REFERENCES workout_plans(id) ON DELETE CASCADE,
+        //         FOREIGN KEY(exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
+        //     );
+        // `);
 
         console.log("Database reset and reinitialized successfully!");
 
@@ -134,7 +143,7 @@ const deleteUser = async () => {
             const db = await SQLite.openDatabaseAsync('flexzone_database');
 
             // `runAsync()` is useful when you want to execute some write operations.
-            await db.runAsync('DELETE FROM users WHERE id = $id', { $id: 2 }); // Binding named parameters from object
+            await db.runAsync('DELETE FROM users WHERE id = $id', { $id: 2 });
 
         }catch (e){
             console.error("error: ", e);
@@ -189,7 +198,6 @@ export const insertExerciseAndLinkToWorkout = async (workout_id: number, exercis
             [exercise_name, "Custom exercise", "General"]
         );
 
-        // Get the last inserted exercise ID (Ensure it returns a valid object)
         const result = await db.getFirstAsync<{ id: number }>("SELECT last_insert_rowid() as id;");
         
         if (!result || !result.id) {
@@ -197,7 +205,7 @@ export const insertExerciseAndLinkToWorkout = async (workout_id: number, exercis
             return;
         }
 
-        const exercise_id = result.id; // Now TypeScript knows `id` exists
+        const exercise_id = result.id;
 
         // Insert into the workout_exercises table
         await db.runAsync(
@@ -230,63 +238,66 @@ export const fetchExercisesForWorkout = async (workout_id: number, callback: (ex
     }
 };
 
+// Commented this section out instead of deleting it all together because 
+// it can serve as a skeleton for an admin screen if we chose to integrate one
 
-export default function TabThreeScreen() {
-    return(
-        <View style={styles.container}>
-            <Text>db-service station</Text>
-            <View
-                style={styles.btn}>
-                <Button
-                title="Database Initialization"
-                onPress={() => initDB()}
-                />
-            </View>
-            {/* <View
-                style={styles.btn}>
-                <Button
-                title="Insert User"
-                onPress={() => insertUser()}
-                />
-            </View>
-            <View
-                style={styles.btn}>
-                <Button
-                title="Select Users"
-                onPress={() => selectUser()}
-                />
-            </View> */}
-            <View
-                style={styles.btn}>
-                <Button
-                title="Update User"
-                onPress={() => updateUser()}
-                />
-            </View>
-            <View
-                style={styles.btn}>
-                <Button
-                title="Delete Users"
-                onPress={() => deleteUser()}
-                />
-            </View>
-        </View>
 
-    );
+// export default function TabThreeScreen() {
+//     return(
+//         <View style={styles.container}>
+//             <Text>db-service station</Text>
+//             <View
+//                 style={styles.btn}>
+//                 <Button
+//                 title="Database Initialization"
+//                 onPress={() => initDB()}
+//                 />
+//             </View>
+//             <View
+//                 style={styles.btn}>
+//                 <Button
+//                 title="Insert User"
+//                 onPress={() => insertUser()}
+//                 />
+//             </View>
+//             <View
+//                 style={styles.btn}>
+//                 <Button
+//                 title="Select Users"
+//                 onPress={() => selectUser()}
+//                 />
+//             </View>
+//             <View
+//                 style={styles.btn}>
+//                 <Button
+//                 title="Update User"
+//                 onPress={() => updateUser()}
+//                 />
+//             </View>
+//             <View
+//                 style={styles.btn}>
+//                 <Button
+//                 title="Delete Users"
+//                 onPress={() => deleteUser()}
+//                 />
+//             </View>
+//         </View>
 
-}
+//     );
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    btn:{
-        width: '90%',
-        height: 50
-    }
+// }
 
-});
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         backgroundColor: '#fff',
+//         alignItems: 'center',
+//         justifyContent: 'center',
+//     },
+//     btn:{
+//         width: '90%',
+//         height: 50
+//     }
+
+// });
 
