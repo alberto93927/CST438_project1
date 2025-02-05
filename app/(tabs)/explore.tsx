@@ -134,12 +134,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-
   exerciseItem: {
     padding: 10,
     marginBottom: 10,
@@ -150,12 +144,6 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 18,
     color: 'black',
-  },
-
-  subExerciseName: {
-    fontSize:16,
-    color:'black',
-    marginLeft: 10,
   },
 
 });
