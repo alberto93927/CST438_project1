@@ -7,11 +7,13 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useSession } from '@/hooks/ctx';
+import useProfile from '@/hooks/useProfile';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   const { session, isLoading } = useSession();
+  const { profile } = useProfile();
 
   if (isLoading) {
     return null;
@@ -24,6 +26,10 @@ export default function TabLayout() {
     // in the headless Node process that the pages are rendered in.
     return <Redirect href="/auth" />;
   }
+
+  // if (session && !profile) {
+  //   return <Redirect href="/onboarding" />;
+  // }
 
   return (
     <Tabs
