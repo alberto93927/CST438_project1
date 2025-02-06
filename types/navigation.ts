@@ -5,3 +5,9 @@ export type RootStackParamList = {
     'ExerciseDetail': { exercise: Exercise };
     '+not-found': undefined;
   };
+
+  export type TabParamList = {
+    home: undefined;
+    explore: undefined; 
+  };
+  
