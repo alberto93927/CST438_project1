@@ -6,8 +6,9 @@
  * You can remove the `reset-project` script from package.json and safely delete this file after running it.
  */
 
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import process from "node:process";
 
 const root = process.cwd();
 const oldDirs = ["app", "components", "hooks", "constants", "scripts"];

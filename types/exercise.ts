@@ -10,6 +10,6 @@ export interface Exercise {
         id: number;
         name: string;
         description: string;
-        [key: string]: any;
+        [key: string]: string | number | boolean;
     }[];
 }
