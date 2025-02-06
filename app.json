@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "fitness",
-    "slug": "fitness",
+    "name": "FlexZone",
+    "slug": "flexzone",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "flexzone",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -17,7 +17,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.fitness"
+      "package": "com.anonymous.flexzone"
     },
     "web": {
       "bundler": "metro",
