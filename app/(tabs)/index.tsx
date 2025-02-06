@@ -13,7 +13,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { HelloWave } from "@/components/HelloWave";
 import { useSession } from "@/hooks/ctx";
 import { GoogleUser } from "@/types/user";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "@/types/navigation"; 
 
 //deafult picture for now
 const DEFAULT_PROFILE_PIC = require('@/assets/images/default-profile.png');
@@ -33,7 +34,7 @@ export default function HomeScreen() {
   const { session, signOut } = useSession();
   const [user, setUser] = useState<GoogleUser | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
 
   useEffect(() => {
     if (session) {
