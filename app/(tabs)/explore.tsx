@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { getExercises, getLanguages } from '../../api/wgerAPI';
+import { getExercises } from '../../api/workOutAPI';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Exercise } from '@/types/exercise';
@@ -11,31 +11,36 @@ import { RootStackParamList } from '@/types/navigation';
 
 export default function ExploreScreen() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [languages, setLanguages] = useState<{ id: number; full_name: string }[]>([]);
-  const [selectedLanguage, setSelectedLanguage] = useState(2); // Default english language
+  const [selectedMuscle, setSelectedMuscle] = useState('');
   const [loading, setLoading] = useState(true);
+  const muscles = [
+    { label: "Abs", value: "abdominals" },
+    { label: "Abductors", value: "abductors" },
+    { label: "Adductors", value: "adductors" },
+    { label: "Biceps", value: "biceps" },
+    { label: "Calves", value: "calves" },
+    { label: "Chest", value: "chest" },
+    { label: "Forearms", value: "forearms" },
+    { label: "Glutes", value: "glutes" },
+    { label: "Hamstrings", value: "hamstrings" },
+    { label: "Lats", value: "lats" },
+    { label: "Lower Back", value: "lower_back" },
+    { label: "Middle Back", value: "middle_back" },
+    { label: "Neck", value: "neck" },
+    { label: "Quads", value: "quadriceps" },
+    { label: "Traps", value: "traps" },
+    { label: "Triceps", value: "triceps" },
+  ];
 
   type NavigationProp = StackNavigationProp<RootStackParamList, 'ExerciseDetail'>;
   const navigation = useNavigation<NavigationProp>();
 
-  useEffect(() => {
-    const fetchLanguages = async () => {
-      try {
-        const languageList = await getLanguages();
-        setLanguages(languageList);
-      } catch (error) {
-        console.error('Error fetching languages:', error);
-      }
-    };
-
-    fetchLanguages();
-  }, []);
-
+  //fetching exercises from the API depending on which muscle is selected
   useEffect(() => {
     const fetchExercises = async () => {
       setLoading(true);
       try {
-        const exercises = await getExercises({ language: selectedLanguage });
+        const exercises = await getExercises({ muscle: selectedMuscle });
         setExercises(exercises);
       } catch (error) {
         console.error('Error fetching exercises:', error);
@@ -45,8 +50,9 @@ export default function ExploreScreen() {
     };
 
     fetchExercises();
-  }, [selectedLanguage]);
+  }, [selectedMuscle]);
 
+  //shows loading message while fetching exercises
   if (loading) {
     return (
       <ThemedView style={styles.container}>
@@ -55,42 +61,33 @@ export default function ExploreScreen() {
     );
   }
 
+  //UI for the page with a Picker based off the muscles from above
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Exercises</ThemedText>
       </ThemedView>
-      <Picker
-        selectedValue={selectedLanguage}
-        onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
+      {<Picker
+        selectedValue={selectedMuscle}
+        onValueChange={(itemValue) => setSelectedMuscle(itemValue)}
         style={styles.picker}
       >
-        {languages.map((language) => (
-          <Picker.Item key={language.id} label={language.full_name} value={language.id} />
+        {muscles.map((muscle, index) => (
+          <Picker.Item key={index} label={muscle.label} value={muscle.value} />
         ))}
-      </Picker>
+
+      </Picker>}
       <FlatList
         data={exercises}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.name.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => navigation.navigate('ExerciseDetail', { exercise: item })}
           >
             <ThemedView style={styles.exerciseCard}>
               <ThemedText style={styles.exerciseTitle}>
-                Category: {item.category.name}
+                {item.name}
               </ThemedText>
-              {item.exercises && item.exercises.length > 0 && (
-                <FlatList
-                  data={item.exercises}
-                  keyExtractor={(subItem) => subItem.id.toString()}
-                  renderItem={({ item: subExercise }) => (
-                    <ThemedText style={styles.subExerciseName}>
-                      - {subExercise.name}
-                    </ThemedText>
-                  )}
-                />
-              )}
             </ThemedView>
           </TouchableOpacity>
         )}
@@ -100,11 +97,6 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 16,
-  },
   titleContainer: {
     marginVertical: 16,
   },
@@ -129,21 +121,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 4,
   },
-  subExerciseName: {
-    marginLeft: 10,
-    fontSize: 14,
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
   },
-
-  exerciseItem: {
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-  },
-
-  categoryName: {
-    fontSize: 18,
-    color: 'black',
-  },
-
 });

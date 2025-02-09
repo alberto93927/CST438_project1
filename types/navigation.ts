@@ -7,3 +7,8 @@ export type RootStackParamList = {
   'AccountSettings': undefined;
   '+not-found': undefined;
 };
+
+export type TabParamList = {
+  home: undefined;
+  explore: undefined;
+};

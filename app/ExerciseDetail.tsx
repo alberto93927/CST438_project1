@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { RootStackParamList } from '@/types/navigation';
-import { getExerciseDetail } from '@/api/wgerAPI';
+import { getExerciseDetail } from '@/api/workOutAPI';
 import { Exercise } from '@/types/exercise';
+import { useRouter } from 'expo-router';
+
 
 type ExerciseDetailRouteProp = RouteProp<RootStackParamList, 'ExerciseDetail'>;
 
@@ -14,11 +16,13 @@ export default function ExerciseDetailScreen() {
   const { exercise } = route.params;
   const [exerciseDetail, setExerciseDetail] = useState<Exercise | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
+  //fetches exercise details based of off exercise name that was clicked on in explore page
   useEffect(() => {
     const fetchExerciseDetail = async () => {
       try {
-        const detail = await getExerciseDetail(exercise.id);
+        const detail = await getExerciseDetail({ name: exercise.name });
         setExerciseDetail(detail);
       } catch (error) {
         console.error('Error fetching exercise detail:', error);
@@ -28,8 +32,9 @@ export default function ExerciseDetailScreen() {
     };
 
     fetchExerciseDetail();
-  }, [exercise.id]);
+  }, [exercise.name]);
 
+  //shows loading message while fetching exercises details
   if (loading) {
     return (
       <ThemedView style={styles.container}>
@@ -46,15 +51,22 @@ export default function ExerciseDetailScreen() {
     );
   }
 
+  //displays exercise details
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ThemedView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/explore')}>
+        <ThemedText style={styles.backButtonText}>← Back</ThemedText>
+      </TouchableOpacity>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">{exerciseDetail.name}</ThemedText>
       </ThemedView>
-      <ThemedText>Category: {exerciseDetail.category.name}</ThemedText>
-      {/* <ThemedText>Equipment: {exerciseDetail.equipment.map(e => e.name).join(', ')}</ThemedText> */}
-      <ThemedText>Description: {exerciseDetail.exercises[0].description}</ThemedText>
-    </ScrollView>
+      <ScrollView style={styles.scrollItem}>
+        <ThemedText style={styles.exerciseItem}>Type: {exerciseDetail.type}</ThemedText>
+        <ThemedText style={styles.exerciseItem}>Equipment: {exerciseDetail.equipment}</ThemedText>
+        <ThemedText style={styles.exerciseItem}>Difficulty: {exerciseDetail.difficulty}</ThemedText>
+        <ThemedText style={styles.exerciseItem}>Instructions: {exerciseDetail.instructions}</ThemedText>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
@@ -63,8 +75,30 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#fff',
+    flexGrow: 1,
   },
   titleContainer: {
     marginBottom: 20,
+  },
+  backButton: {
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#ddd',
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  exerciseItem: {
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+  },
+  scrollItem: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
 });

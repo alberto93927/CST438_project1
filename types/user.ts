@@ -6,3 +6,10 @@ export interface GoogleUser {
     "email": string,
     "photo": string | null
 }
+
+export interface User {
+    g_id: string,
+    username: string,
+    email: string,
+    profile_pic: string | null
+}
