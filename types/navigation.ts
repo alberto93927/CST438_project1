@@ -6,6 +6,7 @@ export type RootStackParamList = {
   'WorkoutDay': { day: string; workout: string };
   'AccountSettings': undefined;
   '+not-found': undefined;
+  'EditWorkout': undefined;
 };
 
 export type TabParamList = {

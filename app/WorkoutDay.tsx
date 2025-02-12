@@ -5,10 +5,14 @@ import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { RootStackParamList } from '@/types/navigation'; // Import your navigation types
+import { useRouter } from 'expo-router';
 
 export default function WorkoutDayScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'WorkoutDay'>>(); // Use the route types
-  const navigation = useNavigation();
+
+  // const navigation = useNavigation();
+  const router = useRouter();
+
   const { day, workout } = route.params;
 
   return (
@@ -18,7 +22,18 @@ export default function WorkoutDayScreen() {
       <ThemedText style={styles.placeholder}>
         Here you can add or modify workouts, sets, and reps for {day}.
       </ThemedText>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+
+      {/* Edit Workout Button */}
+      <TouchableOpacity
+        style={styles.editButton}
+        // onPress={() => navigation.navigate("EditWorkout")}
+        onPress={() => router.push("/editWorkout")}
+      >
+        <ThemedText style={styles.buttonText}>Edit Workout</ThemedText>
+      </TouchableOpacity>
+
+      {/* <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}> */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <ThemedText>Go Back</ThemedText>
       </TouchableOpacity>
     </ThemedView>
@@ -40,5 +55,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
     borderRadius: 8,
     alignSelf: 'center',
+  },
+  editButton: {
+    marginTop: 20,
+    padding: 12,
+    backgroundColor: "#007BFF",
+    borderRadius: 8,
+    alignSelf: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
   },
 });
