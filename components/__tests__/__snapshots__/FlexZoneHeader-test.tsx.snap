@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    [
+      {
+        "backgroundColor": "#fff",
+      },
+      {
+        "marginTop": 16,
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "color": "#11181C",
+        },
+        undefined,
+        {
+          "fontSize": 32,
+          "fontWeight": "bold",
+          "lineHeight": 32,
+        },
+        undefined,
+        undefined,
+        undefined,
+        {
+          "color": "green",
+          "fontWeight": "bold",
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    FlexZone:
+  </Text>
+  <Text
+    style={
+      [
+        {
+          "color": "#11181C",
+        },
+        undefined,
+        undefined,
+        undefined,
+        {
+          "fontSize": 20,
+          "fontWeight": "bold",
+        },
+        undefined,
+        {
+          "color": "green",
+          "fontSize": 18,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    the fitness app
+  </Text>
+</View>
+`;
