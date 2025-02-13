@@ -4,9 +4,7 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Modal,
   FlatList,
-  Platform,
 } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -14,32 +12,49 @@ import { HelloWave } from "@/components/HelloWave";
 import { useSession } from "@/hooks/ctx";
 import { GoogleUser } from "@/types/user";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "@/types/navigation"; 
+import { RootStackParamList } from "@/types/navigation";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-//deafult picture for now
-const DEFAULT_PROFILE_PIC = require('@/assets/images/default-profile.png');
+// Default profile picture (Replace later with Google Profile)
+const DEFAULT_PROFILE_PIC = require("@/assets/images/default-profile.png");
 
-//static!! later replace with new API data
+// Static Workout Split Data (Replace later with API data)
 const workoutSplit = [
-  { day: "Monday", workout: "Push day" },
-  { day: "Tuesday", workout: "Pull day" },
-  { day: "Wednesday", workout: "Leg day" },
-  { day: "Thursday", workout: "Chest and back day" },
-  { day: "Friday", workout: "Shoulders and Arms day" },
-  { day: "Saturday", workout: "Leg day" },
-  { day: "Sunday", workout: "Rest day" },
+  { day: "Monday", workout: "Push Day" },
+  { day: "Tuesday", workout: "Pull Day" },
+  { day: "Wednesday", workout: "Leg Day" },
+  { day: "Thursday", workout: "Chest/Back" },
+  { day: "Friday", workout: "Shoulders/Arms" },
+  { day: "Saturday", workout: "Leg Day" },
+  { day: "Sunday", workout: "Rest" },
 ];
 
 export default function HomeScreen() {
-  const { session, signOut } = useSession();
+  const { session } = useSession();
   const [user, setUser] = useState<GoogleUser | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [workoutData, setWorkoutData] = useState(workoutSplit);
 
   useEffect(() => {
     if (session) {
       setUser(JSON.parse(session));
     }
+
+    const loadWorkoutData = async () => {
+      try {
+        const updatedWorkoutData = await Promise.all(
+          workoutSplit.map(async (item) => {
+            const savedWorkout = await AsyncStorage.getItem(item.day);
+            return savedWorkout ? { ...item, workout: savedWorkout } : item;
+          })
+        );
+        setWorkoutData(updatedWorkoutData);
+      } catch (error) {
+        console.error("Failed to load workout data", error);
+      }
+    };
+
+    loadWorkoutData();
   }, [session]);
 
   const today = new Date();
@@ -50,81 +65,47 @@ export default function HomeScreen() {
     year: "numeric",
   });
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev);
-  };
-
   const handleDayPress = (dayItem: { day: string; workout: string }) => {
     navigation.navigate("WorkoutDay", { day: dayItem.day, workout: dayItem.workout });
   };
 
-  const renderWorkoutCard = ({ item }: { item: { day: string; workout: string } }) => (
-    <TouchableOpacity style={styles.card} onPress={() => handleDayPress(item)}>
-      <ThemedText type="subtitle" style={styles.cardTitle}>
-        {item.day}
-      </ThemedText>
-      <ThemedText>{item.workout}</ThemedText>
-    </TouchableOpacity>
-  );
-
   return (
     <ThemedView style={styles.container}>
-      {/* Header */}
+      {/* Header Section */}
       <View style={styles.header}>
-        {/* Welcome + Wave Animation */}
         <View style={styles.headerLeft}>
-          <ThemedText type="title">Welcome, User</ThemedText>
-          <HelloWave />
-        </View>
-        {/* User's first name + Profile Picture */}
-        <TouchableOpacity style={styles.headerRight} onPress={toggleSidebar}>
-          <ThemedText type="title">
-            {user?.name ? user.name.split(" ")[0] : "User"}
+          <ThemedText style={styles.welcomeText}>
+            Welcome, {user?.name ? user.name.split(" ")[0] : "User"}
           </ThemedText>
+          <HelloWave/>
+        </View>
+        <View style={styles.headerRight}>
           <Image source={DEFAULT_PROFILE_PIC} style={styles.profilePic} />
-        </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Fitness Homepage and Date */}
+      {/* Subheader Section */}
       <View style={styles.subHeader}>
-        <ThemedText type="default">Fitness Homepage</ThemedText>
-        <ThemedText type="default">{formattedDate}</ThemedText>
+        <ThemedText type="subtitle">Your Current Split</ThemedText>
+        <View style={styles.subHeaderDate}>
+          <ThemedText type="default">{formattedDate}</ThemedText>
+        </View>
       </View>
 
-      {/* Workout Split Cards */}
+      {/* Workout Split List */}
       <FlatList
-        data={workoutSplit}
+        data={workoutData}
         keyExtractor={(item) => item.day}
-        renderItem={renderWorkoutCard}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.card} onPress={() => handleDayPress(item)}>
+            <ThemedText type="title" style={styles.cardTitle}>
+              {item.day}
+            </ThemedText>
+            <ThemedText type="subtitle" style={styles.subtitle}>{item.workout}</ThemedText>
+          </TouchableOpacity>
+        )}
         contentContainerStyle={styles.cardList}
       />
-
-      {/* Sidebar Menu */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isSidebarOpen}
-        onRequestClose={toggleSidebar}
-      >
-        <TouchableOpacity style={styles.sidebarOverlay} onPress={toggleSidebar}>
-          <View style={styles.sidebar}>
-            <ThemedText type="title" style={styles.sidebarTitle}>
-              Account Menu
-            </ThemedText>
-            {/* Add additional sidebar buttons/options as needed */}
-            <TouchableOpacity style={styles.sidebarButton} onPress={() => {
-              // Navigate to an account settings screen, if available
-              navigation.navigate("AccountSettings");
-              toggleSidebar();
-            }}>
-              <ThemedText>Edit Profile</ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.sidebarButton} onPress={signOut}>
-              <ThemedText>Sign Out</ThemedText>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </ThemedView>
   );
 }
@@ -132,9 +113,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 20,
+    backgroundColor: "#F7F8FA",
   },
-
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -143,62 +124,54 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
   headerRight: {
-    flexDirection: "row",
     alignItems: "center",
-    gap: 8,
   },
   profilePic: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
-
+  welcomeText: {
+    fontSize: 25,
+    fontWeight: "bold",
+  },
   subHeader: {
-    marginTop: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    marginBottom: 20,
+    alignItems: "flex-start",
   },
-
+  subHeaderDate: {
+    fontSize: 16,
+    color: "#888",
+    marginBottom: 1,
+    marginTop: 1,
+  },
   cardList: {
-    marginTop: 24,
+    paddingBottom: 20,
   },
   card: {
-    backgroundColor: "#fff",
-    padding: 16,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 18,
+    paddingHorizontal: 16,
     marginBottom: 12,
-    borderRadius: 8,
-
+    borderRadius: 12,
+    alignItems: "center",
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-
+    shadowRadius: 6,
     elevation: 2,
   },
   cardTitle: {
-    marginBottom: 4,
+    fontSize: 20,
+    fontWeight: "bold",
   },
-
-  sidebarOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    flexDirection: "row",
-  },
-  sidebar: {
-    width: 250,
-    backgroundColor: "#fff",
-    padding: 16,
-
-  },
-  sidebarTitle: {
-    marginBottom: 16,
-  },
-  sidebarButton: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+  subtitle: {
+    fontSize: 16,
+    color: "#888",
+    fontStyle: "italic",
   },
 });
