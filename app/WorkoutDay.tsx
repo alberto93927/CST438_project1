@@ -10,10 +10,14 @@ import { useRouter } from 'expo-router';
 export default function WorkoutDayScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'WorkoutDay'>>(); // Use the route types
 
+
+
   // const navigation = useNavigation();
   const router = useRouter();
 
+
   const { day, workout } = route.params;
+  //const router = useRouter();
 
   return (
     <ThemedView style={styles.container}>
@@ -36,6 +40,8 @@ export default function WorkoutDayScreen() {
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <ThemedText>Go Back</ThemedText>
       </TouchableOpacity>
+    
+
     </ThemedView>
   );
 }
@@ -56,6 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'center',
   },
+
   editButton: {
     marginTop: 20,
     padding: 12,
@@ -67,5 +74,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     textAlign: "center",
+
   },
 });
