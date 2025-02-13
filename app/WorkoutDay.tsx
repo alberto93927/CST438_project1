@@ -17,7 +17,7 @@ export default function WorkoutDayScreen() {
 
 
   const { day, workout } = route.params;
-  const router = useRouter();
+  //const router = useRouter();
 
   return (
     <ThemedView style={styles.container}>
@@ -40,9 +40,7 @@ export default function WorkoutDayScreen() {
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <ThemedText>Go Back</ThemedText>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.addButton} onPress={() => router.push('/AddWorkout')}>
-        <ThemedText>Add</ThemedText>
-      </TouchableOpacity>
+    
 
     </ThemedView>
   );
