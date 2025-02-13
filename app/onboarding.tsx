@@ -7,10 +7,11 @@ import { router } from "expo-router";
 import { createUser } from "@/db/user";
 import { useSQLiteContext } from "expo-sqlite";
 import { createProfile } from "@/db/profile";
+import { GoogleUser } from "@/types/user";
 
 export default function OnboardingScreen() {
     const { session } = useSession();
-    const [googleUser, setGoogleUser] = useState();
+    const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
     const [age, setAge] = useState();
     const [height, setHeight] = useState();
     const [weight, setWeight] = useState();
@@ -28,10 +29,10 @@ export default function OnboardingScreen() {
 
     const userInit = async () => {
         return await createUser({
-            g_id: googleUser?.id,
-            username: googleUser?.name,
-            email: googleUser?.email,
-            profile_pic: googleUser?.photo
+            g_id: googleUser?.id || "",
+            username: googleUser?.name || "",
+            email: googleUser?.email || "",
+            profile_pic: googleUser?.photo || ""
         })
     }
 
