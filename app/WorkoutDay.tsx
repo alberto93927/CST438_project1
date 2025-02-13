@@ -9,8 +9,13 @@ import { useRouter } from 'expo-router';
 
 export default function WorkoutDayScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'WorkoutDay'>>(); // Use the route types
-  const Addroute = useRoute<RouteProp<RootStackParamList, 'AddWorkout'>>();
-  const navigation = useNavigation();
+
+
+
+  // const navigation = useNavigation();
+  const router = useRouter();
+
+
   const { day, workout } = route.params;
   const router = useRouter();
 
@@ -21,7 +26,18 @@ export default function WorkoutDayScreen() {
       <ThemedText style={styles.placeholder}>
         Here you can add or modify workouts, sets, and reps for {day}.
       </ThemedText>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+
+      {/* Edit Workout Button */}
+      <TouchableOpacity
+        style={styles.editButton}
+        // onPress={() => navigation.navigate("EditWorkout")}
+        onPress={() => router.push("/editWorkout")}
+      >
+        <ThemedText style={styles.buttonText}>Edit Workout</ThemedText>
+      </TouchableOpacity>
+
+      {/* <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}> */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <ThemedText>Go Back</ThemedText>
       </TouchableOpacity>
       <TouchableOpacity style={styles.addButton} onPress={() => router.push('/AddWorkout')}>
@@ -48,11 +64,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'center',
   },
-  addButton: {
+
+  editButton: {
     marginTop: 20,
-    padding: 10,
-    backgroundColor: '#ddd',
+    padding: 12,
+    backgroundColor: "#007BFF",
     borderRadius: 8,
-    alignSelf: 'center',
+    alignSelf: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
+
   },
 });

@@ -7,6 +7,7 @@ export type RootStackParamList = {
   'AccountSettings': undefined;
   'AddWorkout': undefined;
   '+not-found': undefined;
+  'EditWorkout': undefined;
 };
 
 export type TabParamList = {
