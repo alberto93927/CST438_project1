@@ -25,7 +25,9 @@ const initialWorkouts = [
 export default function WorkoutDayScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "WorkoutDay">>();
   const navigation = useNavigation();
+    
   const { day, workout } = route.params;
+  //const router = useRouter();
 
   // Editable workout name
   const [workoutName, setWorkoutName] = useState(workout);
@@ -80,7 +82,10 @@ export default function WorkoutDayScreen() {
       </TouchableOpacity>
       <TouchableOpacity style={styles.button}>
         <ThemedText type="default">Edit Workout</ThemedText>
+
       </TouchableOpacity>
+    
+
     </ThemedView>
   );
 }
@@ -140,6 +145,20 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 30,
+  },
+
+  editButton: {
+    marginTop: 20,
+    padding: 12,
+    backgroundColor: "#007BFF",
+    borderRadius: 8,
+    alignSelf: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
+
   },
 });
 
