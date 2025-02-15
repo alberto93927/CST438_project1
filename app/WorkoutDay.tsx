@@ -154,11 +154,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: "center",
   },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    textAlign: "center",
-
-  },
 });
 
