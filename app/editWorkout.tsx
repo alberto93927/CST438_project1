@@ -1,28 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { CheckBox } from "react-native-elements";
-import { useNavigation } from "@react-navigation/native";
+import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from "@/types/navigation";
+import { fetchWorkoutExercises, updateWorkoutExerciseByName, deleteExerciseFromWorkoutPlanByName } from "@/db/workoutPlan";
 
-const EditWorkout: React.FC = () => {
+export default function EditWorkoutScreen() {
+  const route = useRoute<RouteProp<RootStackParamList, "editWorkout">>();
   const navigation = useNavigation();
+  const { day } = route.params;
 
-  // Hardcoded list of exercises
-  const [exercises, setExercises] = useState([
-    { id: "1", name: "Incline Chest Press", selected: false },
-    { id: "2", name: "Flat Chest Press", selected: false },
-    { id: "3", name: "Shoulder Press", selected: false },
-    { id: "4", name: "Lateral Raises", selected: false },
-    { id: "5", name: "Tricep Pushdowns", selected: false },
-    { id: "6", name: "Tricep Extensions", selected: false },
-  ]);
+  const [workoutExercises, setWorkoutExercises] = useState<{ name: string; sets: number; reps: number }[]>([]);
 
-  // Function to toggle checkbox
-  const toggleSelection = (id: string) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) =>
-        exercise.id === id ? { ...exercise, selected: !exercise.selected } : exercise
-      )
-    );
+  // Load exercises from the database when the screen loads
+  useEffect(() => {
+    const loadExercises = async () => {
+      try {
+        const exercises = await fetchWorkoutExercises(day);
+        setWorkoutExercises(exercises);
+      } catch (error) {
+        console.error("Failed to fetch workout exercises:", error);
+      }
+    };
+
+    loadExercises();
+  }, []);
+
+  // Update sets and reps in the database using exercise name
+  const handleUpdateExercise = async (name: string, sets: number, reps: number) => {
+    const success = await updateWorkoutExerciseByName(name, sets, reps);
+    if (success) {
+      setWorkoutExercises((prevExercises) =>
+        prevExercises.map((exercise) =>
+          exercise.name === name ? { ...exercise, sets, reps } : exercise
+        )
+      );
+    }
+  };
+
+  // Delete an exercise from the workout plan using exercise name
+  const handleDeleteExercise = async (name: string) => {
+    const success = await deleteExerciseFromWorkoutPlanByName(name);
+    if (success) {
+      setWorkoutExercises((prevExercises) => prevExercises.filter((exercise) => exercise.name !== name));
+    }
   };
 
   return (
@@ -33,42 +53,51 @@ const EditWorkout: React.FC = () => {
       </TouchableOpacity>
 
       {/* Title */}
-      <Text style={styles.title}>Edit Workout</Text>
+      <Text style={styles.title}>Edit Workout - {day}</Text>
 
-      {/* List of Exercises */}
+      {/* List of Exercises with Editable Sets/Reps */}
       <FlatList
-        data={exercises}
-        keyExtractor={(item) => item.id}
+        data={workoutExercises}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <View style={styles.exerciseContainer}>
-            <CheckBox
-              checked={item.selected}
-              onPress={() => toggleSelection(item.id)}
-              containerStyle={styles.checkbox}
+            <Text style={styles.exerciseName}>{item.name}</Text>
+
+            {/* Editable Sets Input */}
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={item.sets.toString()}
+              onChangeText={(text) => handleUpdateExercise(item.name, parseInt(text) || 0, item.reps)}
             />
-            <TextInput style={styles.input} value={item.name} editable={false} />
+
+            {/* Editable Reps Input */}
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={item.reps.toString()}
+              onChangeText={(text) => handleUpdateExercise(item.name, item.sets, parseInt(text) || 0)}
+            />
+
+            {/* Delete Button */}
+            <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteExercise(item.name)}>
+              <Text style={styles.deleteText}>🗑️</Text>
+            </TouchableOpacity>
           </View>
         )}
       />
-
-      {/* Delete Button */}
-      <TouchableOpacity style={styles.deleteButton}>
-        <Text style={styles.deleteText}>Delete</Text>
-      </TouchableOpacity>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
-    flexGrow: 1,
   },
   backButton: {
     padding: 10,
-    marginBottom: 10,
     backgroundColor: "#ddd",
     borderRadius: 5,
     alignSelf: "flex-start",
@@ -85,33 +114,30 @@ const styles = StyleSheet.create({
   exerciseContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    justifyContent: "space-between",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
   },
-  checkbox: {
-    padding: 0,
-    margin: 0,
+  exerciseName: {
+    fontSize: 18,
+    flex: 2,
   },
   input: {
-    flex: 1,
-    borderWidth: 1,
+    width: 50,
+    borderBottomWidth: 1,
     borderColor: "#000",
-    padding: 8,
-    borderRadius: 5,
-    backgroundColor: "#f0f0f0",
+    textAlign: "center",
+    fontSize: 16,
   },
   deleteButton: {
-    marginTop: 20,
-    padding: 12, 
+    padding: 5,
     backgroundColor: "red",
-    borderRadius: 8,
-    alignSelf: "center",
+    borderRadius: 5,
   },
   deleteText: {
     color: "white",
-    fontSize: 18,
-    textAlign: "center",
+    fontSize: 16,
   },
 });
 
-
-export default EditWorkout;

@@ -37,6 +37,17 @@ export const initDB = async (db: SQLiteDatabase) => {
                 name TEXT NOT NULL,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             );
+
+            CREATE TABLE IF NOT EXISTS workout_plan_exercises (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                workout_plan_id INTEGER,
+                exercise_id INTEGER,
+                day TEXT NOT NULL, 
+                sets INTEGER NOT NULL,
+                reps INTEGER NOT NULL,
+                FOREIGN KEY(workout_plan_id) REFERENCES workout_plan(id),
+                FOREIGN KEY(exercise_id) REFERENCES exercise(id)
+            );
         `);
     } catch (e) {
         console.error("Database Error: ", e);
