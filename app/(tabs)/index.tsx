@@ -31,17 +31,11 @@ const workoutSplit = [
 ];
 
 export default function HomeScreen() {
-  const { session } = useSession();
-  const [user, setUser] = useState<GoogleUser | null>(null);
   const { profile } = useProfile();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [workoutData, setWorkoutData] = useState(workoutSplit);
 
   useEffect(() => {
-    if (session) {
-      setUser(JSON.parse(session));
-    }
-
     const loadWorkoutData = async () => {
       try {
         const updatedWorkoutData = await Promise.all(
@@ -57,7 +51,7 @@ export default function HomeScreen() {
     };
 
     loadWorkoutData();
-  }, [session]);
+  }, []);
 
   const today = new Date();
   const formattedDate = today.toLocaleDateString("en-US", {
@@ -77,12 +71,12 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <ThemedText style={styles.welcomeText}>
-            Welcome, {user?.name ? user.name.split(" ")[0] : "User"}
+            Welcome, {profile?.user?.username ? profile?.user?.username.split(" ")[0] : "User"}
           </ThemedText>
           <HelloWave/>
         </View>
         <View style={styles.headerRight}>
-          <Image source={DEFAULT_PROFILE_PIC} style={styles.profilePic} />
+          <Image source={profile?.user?.profile_pic || DEFAULT_PROFILE_PIC} style={styles.profilePic} />
         </View>
       </View>
 

@@ -9,7 +9,7 @@ const useProfile = () => {
   useEffect(() => {
     if (session) {
       getProfile(session).then((res) => {
-        console.log(res)
+        // console.log(res)
         if (res) {
           setProfile(res)
         }

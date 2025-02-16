@@ -1,5 +1,5 @@
-import { Redirect, Tabs } from 'expo-router';
-import React from 'react';
+import { Redirect, router, Tabs } from 'expo-router';
+import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -7,13 +7,11 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useSession } from '@/hooks/ctx';
-import useProfile from '@/hooks/useProfile';
+import { getProfile } from '@/db/profile';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
   const { session, isLoading } = useSession();
-  const { profile } = useProfile();
 
   if (isLoading) {
     return null;
@@ -27,9 +25,17 @@ export default function TabLayout() {
     return <Redirect href="/auth" />;
   }
 
-  if (session && !profile) {
-    return <Redirect href="/onboarding" />;
-  }
+  useEffect(() => {
+    getProfile(session).then((res) => {
+      if (res && session) {
+        router.push('/(tabs)')
+      } else {
+        router.push('/onboarding')
+      }
+    }).catch(err => {
+      console.error(err)
+    })
+  }, [])
 
   return (
     <Tabs
@@ -66,7 +72,7 @@ export default function TabLayout() {
           title: 'Profile',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
-       />
+      />
       <Tabs.Screen
         name="db-service"
         options={{
