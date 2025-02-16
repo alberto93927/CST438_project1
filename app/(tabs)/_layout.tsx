@@ -8,6 +8,7 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useSession } from '@/hooks/ctx';
 import { getProfile } from '@/db/profile';
+import { ProfilePic } from '@/components/ProfilePic';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -70,7 +71,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarIcon: ({ color }) => <ProfilePic tab/>,
         }}
       />
       <Tabs.Screen

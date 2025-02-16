@@ -15,6 +15,7 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/types/navigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useProfile from "@/hooks/useProfile";
+import { ProfilePic } from "@/components/ProfilePic";
 
 // Default profile picture (Replace later with Google Profile)
 const DEFAULT_PROFILE_PIC = require("@/assets/images/default-profile.png");
@@ -73,10 +74,10 @@ export default function HomeScreen() {
           <ThemedText style={styles.welcomeText}>
             Welcome, {profile?.user?.username ? profile?.user?.username.split(" ")[0] : "User"}
           </ThemedText>
-          <HelloWave/>
+          <HelloWave />
         </View>
         <View style={styles.headerRight}>
-          <Image source={profile?.user?.profile_pic || DEFAULT_PROFILE_PIC} style={styles.profilePic} />
+          <ProfilePic />
         </View>
       </View>
 
@@ -124,13 +125,6 @@ const styles = StyleSheet.create({
   },
   headerRight: {
     alignItems: "center",
-  },
-  profilePic: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
   welcomeText: {
     fontSize: 25,

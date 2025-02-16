@@ -5,6 +5,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useSession } from "@/hooks/ctx";
 import { GoogleUser } from "@/types/user";
 import useProfile from "@/hooks/useProfile";
+import { ProfilePic } from "@/components/ProfilePic";
 
 export default function ProfileScreen() {
     const { signOut } = useSession();
@@ -13,6 +14,7 @@ export default function ProfileScreen() {
 
     return (
         <ThemedView style={styles.container}>
+            <ProfilePic />
             <ThemedText type="title">{profile?.user?.username}</ThemedText>
             <ThemedText type="subtitle">{profile?.user?.email}</ThemedText>
             <Button
