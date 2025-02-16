@@ -27,9 +27,9 @@ export default function TabLayout() {
     return <Redirect href="/auth" />;
   }
 
-  // if (session && !profile) {
-  //   return <Redirect href="/onboarding" />;
-  // }
+  if (session && !profile) {
+    return <Redirect href="/onboarding" />;
+  }
 
   return (
     <Tabs

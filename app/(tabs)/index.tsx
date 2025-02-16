@@ -14,6 +14,7 @@ import { GoogleUser } from "@/types/user";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/types/navigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useProfile from "@/hooks/useProfile";
 
 // Default profile picture (Replace later with Google Profile)
 const DEFAULT_PROFILE_PIC = require("@/assets/images/default-profile.png");
@@ -32,6 +33,7 @@ const workoutSplit = [
 export default function HomeScreen() {
   const { session } = useSession();
   const [user, setUser] = useState<GoogleUser | null>(null);
+  const { profile } = useProfile();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [workoutData, setWorkoutData] = useState(workoutSplit);
 
