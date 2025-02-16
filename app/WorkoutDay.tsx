@@ -6,7 +6,7 @@ import {
   FlatList,
   View,
 } from "react-native";
-import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { useRoute, useNavigation, RouteProp, NavigationProp } from "@react-navigation/native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { RootStackParamList } from "@/types/navigation";
@@ -24,12 +24,10 @@ const initialWorkouts = [
 
 export default function WorkoutDayScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "WorkoutDay">>();
-  const navigation = useNavigation();
-    
-  const { day, workout } = route.params;
-  //const router = useRouter();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  // Editable workout name
+  const { day, workout } = route.params;
+
   const [workoutName, setWorkoutName] = useState(workout);
 
   useEffect(() => {
@@ -77,12 +75,11 @@ export default function WorkoutDayScreen() {
       />
 
       {/* Bottom Buttons */}
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AddWorkout')}>
         <ThemedText type="default">Add Workout</ThemedText>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EditWorkout')}>
         <ThemedText type="default">Edit Workout</ThemedText>
-
       </TouchableOpacity>
     
 
@@ -146,7 +143,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 30,
   },
-
   editButton: {
     marginTop: 20,
     padding: 12,

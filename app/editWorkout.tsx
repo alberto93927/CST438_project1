@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { CheckBox } from "react-native-elements";
-import { useNavigation } from "@react-navigation/native";
+import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from "@/types/navigation";
 
-const EditWorkout: React.FC = () => {
+
+export default function EditWorkoutScreen() {
+  const route = useRoute<RouteProp<RootStackParamList, 'EditWorkout'>>(); // Use the route types
   const navigation = useNavigation();
 
   // Hardcoded list of exercises
@@ -112,6 +115,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-
-
-export default EditWorkout;
