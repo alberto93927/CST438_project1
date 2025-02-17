@@ -1,7 +1,6 @@
 export interface Profile {
-    user_id: string;
+    user_id: number;
     age: number;
     weight: number;
     height: number;
-    skill_level: string;
 }
