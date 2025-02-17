@@ -22,6 +22,7 @@ export const getExercises = async (params = {}) => {
     }
 };
 
+
 //function for grabbing exercise details
 export const getExerciseDetail = async (params = {}) => {
     const options = {

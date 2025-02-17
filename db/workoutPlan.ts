@@ -105,6 +105,7 @@ export const fetchWorkoutExercises = async (day: string): Promise<WorkoutExercis
     }
 };
 
+
 // Update sets and reps using name instead of id
 export const updateWorkoutExerciseByName = async (name: string, sets: number, reps: number) => {
     const db = await getDatabase();

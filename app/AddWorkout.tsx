@@ -28,10 +28,6 @@ export default function AddWorkoutScreen() {
 
   const addWorkout = async () => {
     console.log("Add Workout button clicked!");
-    console.log(`Selected Exercise: ${selectedExercise}`);
-    console.log(`Sets: ${sets}`);
-    console.log(`Reps: ${reps}`);
-
     if (!selectedExercise || !sets || !reps) {
       console.error("Please fill in all fields.");
       return;
@@ -51,7 +47,7 @@ export default function AddWorkoutScreen() {
       );
 
       if (success) {
-        console.log("✅ Exercise successfully added!");
+        console.log("Exercise successfully added!");
         setSelectedExercise("");
         setSets("");
         setReps("");
@@ -114,10 +110,7 @@ export default function AddWorkoutScreen() {
         keyExtractor={(item) => item.name.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => {
-              console.log(`Exercise Selected: ${item.name}`); // Debug log
-              setSelectedExercise(item.name);
-            }}
+            onPress={() => setSelectedExercise(item.name)}
           >
             <ThemedView style={styles.exerciseCard}>
               <ThemedText style={styles.exerciseTitle}>

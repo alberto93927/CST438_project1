@@ -1,29 +1,32 @@
-import { useSQLiteContext } from "expo-sqlite";
+import * as SQLite from "expo-sqlite";
 import type { Profile } from "@/types/profile";
 
 export const createProfile = async (profile: Profile) => {
-    const db = useSQLiteContext();
+    const db = SQLite.openDatabaseAsync('flexzone_database')
 
-    const statement = await db.prepareAsync(
-        'INSERT INTO profile (user_id, age, weight, height, skill_level) VALUES (?, ?, ?, ?, ?)'
-    );
-    const response = await statement.executeAsync({
-        1: profile.user_id,
-        2: profile.age,
-        3: profile.weight,
-        4: profile.height,
-        5: profile.skill_level
-    });
+    const exists = await getProfile(profile.user_id);
+    if (exists) {
+        console.log('Profile already exists:', exists)
+        return exists;
+    }
 
-    return response;
+    const response = await (await db).runAsync('INSERT INTO profile (user_id, age, weight, height, skill_level) VALUES (?, ?, ?, ?, ?)', [
+        profile.user_id, profile.age, profile.weight, profile.height 
+    ])
+
+
 }
 
-export const getProfile = async ({user_id}: { user_id: string}) => {
-    const db = useSQLiteContext();
+export const getProfile = async (user_id: string | number) => {
+    const db = await SQLite.openDatabaseAsync('flexzone_database')
 
-    const statement = await db.prepareAsync('SELECT * FROM profile WHERE user_id = ?');
+    const user = await db.getFirstAsync('SELECT * FROM user WHERE id = ?', [user_id]);
+    const profile = await db.getFirstAsync('SELECT * FROM profile WHERE user_id = ?', [user_id]);
 
-    const response = await statement.executeAsync(user_id);
+    const userData = {
+        user,
+        profile
+    };
 
-    return await response.getFirstAsync()
+    return userData 
 }
