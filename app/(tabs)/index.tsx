@@ -14,6 +14,8 @@ import { GoogleUser } from "@/types/user";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/types/navigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useProfile from "@/hooks/useProfile";
+import { ProfilePic } from "@/components/ProfilePic";
 
 // Default profile picture (Replace later with Google Profile)
 const DEFAULT_PROFILE_PIC = require("@/assets/images/default-profile.png");
@@ -30,16 +32,11 @@ const workoutSplit = [
 ];
 
 export default function HomeScreen() {
-  const { session } = useSession();
-  const [user, setUser] = useState<GoogleUser | null>(null);
+  const { profile } = useProfile();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [workoutData, setWorkoutData] = useState(workoutSplit);
 
   useEffect(() => {
-    if (session) {
-      setUser(JSON.parse(session));
-    }
-
     const loadWorkoutData = async () => {
       try {
         const updatedWorkoutData = await Promise.all(
@@ -55,7 +52,7 @@ export default function HomeScreen() {
     };
 
     loadWorkoutData();
-  }, [session]);
+  }, []);
 
   const today = new Date();
   const formattedDate = today.toLocaleDateString("en-US", {
@@ -75,12 +72,12 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <ThemedText style={styles.welcomeText}>
-            Welcome, {user?.name ? user.name.split(" ")[0] : "User"}
+            Welcome, {profile?.user?.username ? profile?.user?.username.split(" ")[0] : "User"}
           </ThemedText>
-          <HelloWave/>
+          <HelloWave />
         </View>
         <View style={styles.headerRight}>
-          <Image source={DEFAULT_PROFILE_PIC} style={styles.profilePic} />
+          <ProfilePic />
         </View>
       </View>
 
@@ -128,13 +125,6 @@ const styles = StyleSheet.create({
   },
   headerRight: {
     alignItems: "center",
-  },
-  profilePic: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
   welcomeText: {
     fontSize: 25,
