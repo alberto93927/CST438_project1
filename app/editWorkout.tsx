@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
 import { RootStackParamList } from "@/types/navigation";
 import { fetchWorkoutExercises, updateWorkoutExerciseByName, deleteExerciseFromWorkoutPlanByName } from "@/db/workoutPlan";
 
@@ -46,14 +48,17 @@ export default function EditWorkoutScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backText}>← Back</Text>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <ThemedText style={styles.backArrow}>←</ThemedText>
       </TouchableOpacity>
 
       {/* Title */}
-      <Text style={styles.title}>Edit Workout - {day}</Text>
+      <View style={styles.titleContainer}>
+        <ThemedText type="title">Edit Workout - </ThemedText>
+        <ThemedText style={styles.weekday}>{day}</ThemedText>
+      </View>
 
       {/* List of Exercises with Editable Sets/Reps */}
       <FlatList
@@ -61,7 +66,7 @@ export default function EditWorkoutScreen() {
         keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <View style={styles.exerciseContainer}>
-            <Text style={styles.exerciseName}>{item.name}</Text>
+            <ThemedText style={styles.exerciseName}>{item.name}</ThemedText>
 
             {/* Editable Sets Input */}
             <TextInput
@@ -81,12 +86,13 @@ export default function EditWorkoutScreen() {
 
             {/* Delete Button */}
             <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteExercise(item.name)}>
-              <Text style={styles.deleteText}>🗑️</Text>
+              <ThemedText style={styles.deleteText}>🗑️</ThemedText>
             </TouchableOpacity>
           </View>
         )}
+        contentContainerStyle={styles.workoutList}
       />
-    </View>
+    </ThemedView>
   );
 }
 
@@ -94,34 +100,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#F7F8FA",
   },
   backButton: {
-    padding: 10,
-    backgroundColor: "#ddd",
-    borderRadius: 5,
     alignSelf: "flex-start",
+    marginBottom: 20,
   },
-  backText: {
-    fontSize: 16,
-    color: "#000",
+  backArrow: {
+    fontSize: 40,
+    color: "#333",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 1,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 40,
+    textAlign: "center",
   },
   exerciseContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 10,
+    padding: 8,
     borderBottomWidth: 1,
     borderColor: "#ccc",
   },
   exerciseName: {
     fontSize: 18,
     flex: 2,
+    color: "#444",
+    fontStyle: "italic",
+  },
+  weekday: {
+    fontSize: 24, 
+    fontStyle: "italic",
+    color: "#888", 
   },
   input: {
     width: 50,
@@ -139,5 +156,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
   },
+  workoutList: {
+    marginBottom: 30,
+    marginTop: 20,
+  },
 });
-

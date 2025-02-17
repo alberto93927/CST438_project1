@@ -13,16 +13,6 @@ import { RootStackParamList } from "@/types/navigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchWorkoutExercises } from "@/db/workoutPlan";
 
-// Static Workout List (Replace with API later)
-const initialWorkouts = [
-  "Incline Chest Press",
-  "Flat Chest Press",
-  "Shoulder Press",
-  "Lateral Raises",
-  "Tricep Pushdown",
-  "Tricep Extensions",
-];
-
 export default function WorkoutDayScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "WorkoutDay">>();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -32,7 +22,6 @@ export default function WorkoutDayScreen() {
   // Editable workout name
   const [workoutName, setWorkoutName] = useState(workout);
   const [workoutExercises, setWorkoutExercises] = useState<{ name: string; sets: number; reps: number }[]>([]);
-
 
   useEffect(() => {
     const saveWorkoutName = async () => {
@@ -46,7 +35,7 @@ export default function WorkoutDayScreen() {
     saveWorkoutName();
   }, [workoutName, day]);
 
-  //fetching workouts from DB
+  // Fetching workouts from DB
   useEffect(() => {
     const loadExercises = async () => {
       try {
@@ -58,7 +47,7 @@ export default function WorkoutDayScreen() {
     };
 
     loadExercises();
-  }, []);
+  }, [day]);
 
   return (
     <ThemedView style={styles.container}>
@@ -79,22 +68,9 @@ export default function WorkoutDayScreen() {
         />
       </View>
 
-      {/* Workout List */}
+      {/* Workout List from DB */}
       <ThemedText type="subtitle" style={styles.workoutListTitle}>
-        Workouts List
-      </ThemedText>
-      <FlatList
-        data={initialWorkouts}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-          <ThemedText style={styles.workoutItem}>• {item}</ThemedText>
-        )}
-        contentContainerStyle={styles.workoutList}
-      />
-
-        {/* WorkoutList from DB */}
-      <ThemedText type="subtitle" style={styles.workoutListTitle}>
-        Workout Plan Exercises
+        Workout Exercises:
       </ThemedText>
       <FlatList
         data={workoutExercises}
@@ -108,15 +84,12 @@ export default function WorkoutDayScreen() {
       />
 
       {/* Bottom Buttons */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AddWorkout",
-        { day: day, userId: "test", workoutPlanName: workoutName })}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AddWorkout", { day, userId: "test", workoutPlanName: workoutName })}>
         <ThemedText type="default">Add Workout</ThemedText>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("editWorkout", { day })}>
-          <ThemedText type="default">Edit Workout</ThemedText>
+        <ThemedText type="default">Edit Workout</ThemedText>
       </TouchableOpacity>
-
-
     </ThemedView>
   );
 }
@@ -173,17 +146,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 15,
   },
-  editButton: {
-    marginTop: 20,
-    padding: 12,
-    backgroundColor: "#007BFF",
-    borderRadius: 8,
-    alignSelf: "center",
-  },
   buttonText: {
-    color: "white",
-    fontSize: 18,
-    textAlign: "center",
-
+    color: "#fff",
+    fontSize: 30,
   },
 });
