@@ -26,10 +26,8 @@ const initialWorkouts = [
 export default function WorkoutDayScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "WorkoutDay">>();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  //const AddNavigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const { day, workout } = route.params;
-  //const router = useRouter();
 
   // Editable workout name
   const [workoutName, setWorkoutName] = useState(workout);
@@ -114,9 +112,8 @@ export default function WorkoutDayScreen() {
         { day: day, userId: "test", workoutPlanName: workoutName })}>
         <ThemedText type="default">Add Workout</ThemedText>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
-        <ThemedText type="default">Edit Workout</ThemedText>
-
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("editWorkout", { day })}>
+          <ThemedText type="default">Edit Workout</ThemedText>
       </TouchableOpacity>
 
 
@@ -190,4 +187,3 @@ const styles = StyleSheet.create({
 
   },
 });
-

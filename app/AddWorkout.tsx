@@ -47,7 +47,7 @@ export default function AddWorkoutScreen() {
       );
 
       if (success) {
-        console.log("✅ Exercise successfully added!");
+        console.log("Exercise successfully added!");
         setSelectedExercise("");
         setSets("");
         setReps("");

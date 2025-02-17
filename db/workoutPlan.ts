@@ -104,3 +104,38 @@ export const fetchWorkoutExercises = async (day: string): Promise<WorkoutExercis
         return [];
     }
 };
+
+
+// Update sets and reps using name instead of id
+export const updateWorkoutExerciseByName = async (name: string, sets: number, reps: number) => {
+    const db = await getDatabase();
+
+    try {
+        await db.runAsync(
+            "UPDATE workout_plan_exercises SET sets = ?, reps = ? WHERE exercise_id = (SELECT id FROM exercise WHERE name = ?)",
+            sets, reps, name
+        );
+        console.log(`✅ Updated ${name} with ${sets} sets and ${reps} reps.`);
+        return true;
+    } catch (error) {
+        console.error("Error updating workout exercise:", error);
+        return false;
+    }
+};
+
+// Delete an exercise using name instead of id
+export const deleteExerciseFromWorkoutPlanByName = async (name: string) => {
+    const db = await getDatabase();
+
+    try {
+        await db.runAsync(
+            "DELETE FROM workout_plan_exercises WHERE exercise_id = (SELECT id FROM exercise WHERE name = ?)",
+            [name]
+        );
+        console.log(`✅ Deleted exercise ${name} from workout plan.`);
+        return true;
+    } catch (error) {
+        console.error("Error deleting exercise:", error);
+        return false;
+    }
+};
