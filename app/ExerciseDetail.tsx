@@ -62,6 +62,7 @@ export default function ExerciseDetailScreen() {
       </ThemedView>
       <ScrollView style={styles.scrollItem}>
         <ThemedText style={styles.exerciseItem}>Type: {exerciseDetail.type}</ThemedText>
+        <ThemedText style={styles.exerciseItem}>Muscle: {exerciseDetail.muscle}</ThemedText>
         <ThemedText style={styles.exerciseItem}>Equipment: {exerciseDetail.equipment}</ThemedText>
         <ThemedText style={styles.exerciseItem}>Difficulty: {exerciseDetail.difficulty}</ThemedText>
         <ThemedText style={styles.exerciseItem}>Instructions: {exerciseDetail.instructions}</ThemedText>

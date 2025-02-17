@@ -6,31 +6,22 @@ import {
   FlatList,
   View,
 } from "react-native";
-import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { useRoute, useNavigation, RouteProp, NavigationProp } from "@react-navigation/native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { RootStackParamList } from "@/types/navigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// Static Workout List (Replace with API later)
-const initialWorkouts = [
-  "Incline Chest Press",
-  "Flat Chest Press",
-  "Shoulder Press",
-  "Lateral Raises",
-  "Tricep Pushdown",
-  "Tricep Extensions",
-];
+import { fetchWorkoutExercises } from "@/db/workoutPlan";
 
 export default function WorkoutDayScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "WorkoutDay">>();
-  const navigation = useNavigation();
-    
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   const { day, workout } = route.params;
-  //const router = useRouter();
 
   // Editable workout name
   const [workoutName, setWorkoutName] = useState(workout);
+  const [workoutExercises, setWorkoutExercises] = useState<{ name: string; sets: number; reps: number }[]>([]);
 
   useEffect(() => {
     const saveWorkoutName = async () => {
@@ -43,6 +34,20 @@ export default function WorkoutDayScreen() {
 
     saveWorkoutName();
   }, [workoutName, day]);
+
+  // Fetching workouts from DB
+  useEffect(() => {
+    const loadExercises = async () => {
+      try {
+        const exercises = await fetchWorkoutExercises(day);
+        setWorkoutExercises(exercises);
+      } catch (error) {
+        console.error("Failed to fetch workouts", error);
+      }
+    };
+
+    loadExercises();
+  }, [day]);
 
   return (
     <ThemedView style={styles.container}>
@@ -63,29 +68,28 @@ export default function WorkoutDayScreen() {
         />
       </View>
 
-      {/* Workout List */}
+      {/* Workout List from DB */}
       <ThemedText type="subtitle" style={styles.workoutListTitle}>
-        Workouts List
+        Workout Exercises:
       </ThemedText>
       <FlatList
-        data={initialWorkouts}
-        keyExtractor={(item) => item}
+        data={workoutExercises}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
-          <ThemedText style={styles.workoutItem}>• {item}</ThemedText>
+          <ThemedText style={styles.workoutItem}>
+            • {item.name} - {item.sets} sets x {item.reps} reps
+          </ThemedText>
         )}
         contentContainerStyle={styles.workoutList}
       />
 
       {/* Bottom Buttons */}
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AddWorkout", { day, userId: "test", workoutPlanName: workoutName })}>
         <ThemedText type="default">Add Workout</ThemedText>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("editWorkout", { day })}>
         <ThemedText type="default">Edit Workout</ThemedText>
-
       </TouchableOpacity>
-    
-
     </ThemedView>
   );
 }
@@ -146,19 +150,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 30,
   },
-
-  editButton: {
-    marginTop: 20,
-    padding: 12,
-    backgroundColor: "#007BFF",
-    borderRadius: 8,
-    alignSelf: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    textAlign: "center",
-
-  },
 });
-

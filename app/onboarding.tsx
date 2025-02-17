@@ -2,20 +2,30 @@ import React from "react";
 import { router } from "expo-router";
 import { ViewStyle, TextInput, Button, TextStyle } from "react-native";
 import { Controller, useForm, SubmitErrorHandler, FieldValues } from 'react-hook-form';
+import { createProfile } from "@/db/profile";
 
 import type { OnboardingForm } from "@/types/onboarding";
 
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import FlexZoneHeader from "@/components/FlexZoneHeader";
+import { useSession } from "@/hooks/ctx";
+import useProfile from "@/hooks/useProfile";
 
 export default function OnboardingScreen() {
+    const { session } = useSession();
     const { control, handleSubmit, formState: { errors }, register, reset } = useForm<OnboardingForm>({
         mode: 'onChange'
     });
 
     const onSubmit = async (data: any) => {
-        console.log(data)
+        await createProfile({
+            user_id: Number(session) || 0,
+            age: data.age,
+            weight: data.weight,
+            height: data.heightFeet * 12 + data.heightInches,
+        });
+        useProfile()
         router.replace("/");
     };
 

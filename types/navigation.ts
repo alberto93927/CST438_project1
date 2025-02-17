@@ -5,9 +5,9 @@ export type RootStackParamList = {
   'ExerciseDetail': { exercise: Exercise };
   'WorkoutDay': { day: string; workout: string };
   'AccountSettings': undefined;
-  'AddWorkout': undefined;
+  'AddWorkout': { day: string; userId: string, workoutPlanName: string };
   '+not-found': undefined;
-  'EditWorkout': undefined;
+  'editWorkout': { day: string};
 };
 
 export type TabParamList = {
